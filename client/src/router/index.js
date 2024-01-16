@@ -1,11 +1,34 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "../views/HomeView.vue";
+import ContainerView from "../views/ContainerView.vue";
+import ImageView from "../views/ImageView.vue";
+import VolumeView from "../views/VolumeView.vue";
+import CleanUpView from "../views/CleanUpView.vue";
 
 const routes = [
   {
-    path: "/",
-    name: "home",
-    component: HomeView,
+    path: "",
+    name: "none",
+    redirect: "container",
+  },
+  {
+    path: "/container",
+    name: "container-view",
+    component: ContainerView,
+  },
+  {
+    path: "/image",
+    name: "image-view",
+    component: ImageView,
+  },
+  {
+    path: "/volume",
+    name: "volume-view",
+    component: VolumeView,
+  },
+  {
+    path: "/clean",
+    name: "clean-up-view",
+    component: CleanUpView,
   },
 ];
 

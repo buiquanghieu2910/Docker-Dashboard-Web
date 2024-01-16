@@ -35,9 +35,7 @@
       </div>
 
       <div style="margin-top: 1.5em">
-        <template v-if="isSelected.container">
-          <ContainerComponent />
-        </template>
+        <slot></slot>
       </div>
     </el-main>
   </el-container>
@@ -45,12 +43,10 @@
 
 <script>
 import IconSystem from "@/components/IconSystem.vue";
-import ContainerComponent from "@/components/ContainerComponent.vue";
 
 export default {
   components: {
     IconSystem,
-    ContainerComponent,
   },
 
   data() {
@@ -64,8 +60,21 @@ export default {
     };
   },
 
+  mounted() {
+    const pathCurrent = this.$router.currentRoute.value.path;
+
+    for (const key of Object.keys(this.isSelected)) {
+      if (pathCurrent.includes(key)) {
+        this.isSelected[key] = true;
+      } else {
+        this.isSelected[key] = false;
+      }
+    }
+  },
+
   methods: {
     handleClickTab(type) {
+      this.$router.push(type);
       for (const key of Object.keys(this.isSelected)) {
         if (key == type) {
           this.isSelected[key] = true;

@@ -6,3 +6,11 @@
   justify-content: center;
   display: flex;
 }
+
+.el-loading-spinner .path {
+  stroke-width: 3.5px;
+}
+
+.el-loading-spinner .el-loading-text {
+  font-size: 16px;
+}
