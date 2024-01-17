@@ -16,9 +16,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 const containerApi = require("./routes/Container");
+const groupApi = require("./routes/Groups");
 const imageApi = require("./routes/Image");
 
 app.use("/api/container", containerApi);
+app.use("/api/groups", groupApi);
 app.use("/api/image", imageApi);
 
 // catch 404 and forward to error handler

@@ -24,7 +24,7 @@ exports.fetch = async (req, res) => {
       }
     })
   );
-  res.json(results.sort((a, b) => (a.Name > b.Name ? 1 : -1)));
+  res.json(results.sort((a, b) => (a.created > b.created ? 1 : -1)));
 };
 
 exports.fetchById = async (req, res) => {

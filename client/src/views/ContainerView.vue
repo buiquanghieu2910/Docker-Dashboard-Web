@@ -32,7 +32,12 @@
 
       <div class="data-table">
         <template v-if="!isSelected.group">
-          <AllData :data="dataViews" :status="status" />
+          <AllData
+            :data="dataViews"
+            :status="status"
+            @changeStatus="changeStatus"
+            @getLogs="getLogs"
+          />
         </template>
       </div>
     </div>
@@ -43,8 +48,14 @@
 import LayoutSystem from "@/components/LayoutSystem.vue";
 import IconSystem from "@/components/IconSystem.vue";
 import AllData from "@/components/containers/AllData.vue";
-import { getContainers, getConsumptionStats } from "@/utils/Slices";
+import {
+  getContainers,
+  getConsumptionStats,
+  execCommandContainer,
+  getLogsContainer,
+} from "@/utils/Slices";
 import { loadingPage } from "@/utils/Common";
+import constant from "@/utils/Constant";
 
 export default {
   components: {
@@ -64,13 +75,20 @@ export default {
       keyQuery: "type",
       status: null,
       dataViews: [],
+      intervalId: null,
     };
   },
 
   watch: {
     async status() {
+      loadingPage(true);
       await this.getContainers(this.status);
+      loadingPage(false);
     },
+  },
+
+  beforeUnmount() {
+    clearInterval(this.intervalId);
   },
 
   mounted() {
@@ -88,6 +106,10 @@ export default {
     this.pushParamSearchToUrl(this.keyQuery, valueKey);
     this.handleClickTab(valueKey);
     this.status = valueKey;
+
+    this.intervalId = setInterval(async () => {
+      await this.getContainers(this.status);
+    }, constant.INTERVAL_TIME);
   },
 
   methods: {
@@ -118,14 +140,12 @@ export default {
      * @param {*} status
      */
     async getContainers(status) {
-      loadingPage(true);
-      const resp = await getContainers(status);
-      let stats = [];
-      if (status == "all" || status == "active") {
-        stats = await getConsumptionStats();
-      }
+      const [containers, stats] = await Promise.all([
+        getContainers(status),
+        getConsumptionStats(),
+      ]);
 
-      const updatedContainers = resp.map((container) => {
+      this.dataViews = containers.map((container) => {
         const stat = stats.find((s) => container.short_id === s.id) || {};
         return {
           ...container,
@@ -136,8 +156,27 @@ export default {
           },
         };
       });
+    },
+
+    /**
+     * Change status
+     * @param {*} data
+     */
+    async changeStatus(data) {
+      loadingPage(true);
+      await execCommandContainer(data.id, data.value);
       loadingPage(false);
-      this.dataViews = updatedContainers;
+    },
+
+    /**
+     * Get logs
+     * @param {*} id
+     */
+    async getLogs(id) {
+      loadingPage(true);
+      const response = await getLogsContainer(id);
+      loadingPage(false);
+      console.log(response);
     },
   },
 };
